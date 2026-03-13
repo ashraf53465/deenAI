@@ -35,16 +35,23 @@ export function initSidebar(container) {
       <div class="sidebar-section-title">Topics</div>
       <nav class="sidebar-nav">
         ${Object.entries(structure).map(([key, cat]) => `
-          <div class="sidebar-nav-item" data-category="${key}">
-            <span class="nav-icon">${cat.icon}</span>
-            <span class="nav-label">${cat.label}</span>
-          </div>
-          ${Object.entries(cat.subcategories).map(([subKey, sub]) => `
-            <div class="sidebar-nav-item" data-category="${key}" data-subcategory="${subKey}" style="padding-left: 2.5rem; font-size: 0.85rem;">
-              <span class="nav-icon" style="font-size: 0.7rem;">●</span>
-              <span class="nav-label" style="font-size: 0.95rem;">${sub.label}</span>
+          <div class="sidebar-category-group" id="group-${key}">
+            <div class="sidebar-nav-item category-toggle" data-category="${key}">
+              <div class="nav-item-left">
+                <span class="nav-icon">${cat.icon}</span>
+                <span class="nav-label">${cat.label}</span>
+              </div>
+              <span class="nav-chevron">▼</span>
             </div>
-          `).join('')}
+            <div class="sidebar-subcategories">
+              ${Object.entries(cat.subcategories).map(([subKey, sub]) => `
+                <div class="sidebar-nav-item subcategory-item" data-category="${key}" data-subcategory="${subKey}">
+                  <span class="nav-icon" style="font-size: 0.7rem;">●</span>
+                  <span class="nav-label" style="font-size: 0.95rem;">${sub.label}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
         `).join('')}
       </nav>
       
@@ -65,23 +72,29 @@ export function initSidebar(container) {
     closeSidebar();
   });
   
-  // Category nav clicks — trigger a search via the global handler
-  const navItems = container.querySelectorAll('.sidebar-nav-item');
-  navItems.forEach(item => {
+  // Category toggles (show/hide subcategories)
+  const categoryToggles = container.querySelectorAll('.category-toggle');
+  categoryToggles.forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      const category = toggle.dataset.category;
+      const group = document.getElementById(`group-${category}`);
+      if (group) {
+        group.classList.toggle('open');
+      }
+    });
+  });
+  
+  // Subcategory nav clicks — trigger a search
+  const subcategoryItems = container.querySelectorAll('.subcategory-item');
+  subcategoryItems.forEach(item => {
     item.addEventListener('click', () => {
       const category = item.dataset.category;
       const subcategory = item.dataset.subcategory;
       
-      let query = '';
-      if (subcategory) {
-        const subLabel = structure[category]?.subcategories?.[subcategory]?.label || '';
-        query = subLabel;
-      } else {
-        query = `${structure[category]?.label || ''} duas and sunnah`;
-      }
+      const subLabel = structure[category]?.subcategories?.[subcategory]?.label || '';
       
-      if (query && window.handleSuggestionClick) {
-        window.handleSuggestionClick(query);
+      if (subLabel && window.handleSuggestionClick) {
+        window.handleSuggestionClick(subLabel);
       }
       closeSidebar();
     });

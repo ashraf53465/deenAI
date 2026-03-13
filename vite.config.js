@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   root: '.',
-  base: '/deen-ai/',
+  base: '/deenAI/',
   publicDir: 'public',
   build: {
     outDir: 'dist',

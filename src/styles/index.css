@@ -910,3 +910,102 @@ body {
   margin: 0 auto var(--space-lg);
   opacity: 0.15;
 }
+
+/* ═══════════════════════════════════════════════
+   QUICK VIEW MODAL
+   ═══════════════════════════════════════════════ */
+.quick-view-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(26, 20, 8, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-med);
+  padding: var(--space-md);
+}
+
+.quick-view-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.quick-view-modal {
+  background: var(--bg-primary);
+  width: 100%;
+  max-width: 550px;
+  max-height: 85vh;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-float);
+  display: flex;
+  flex-direction: column;
+  transform: translateY(20px) scale(0.98);
+  transition: all var(--transition-med);
+  border: 1px solid var(--border);
+}
+
+.quick-view-overlay.visible .quick-view-modal {
+  transform: translateY(0) scale(1);
+}
+
+.quick-view-header {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(250, 243, 230, 0.95);
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
+  z-index: 10;
+}
+
+.quick-view-title {
+  font-family: var(--font-handwritten);
+  font-size: 1.6rem;
+  color: var(--green-deep);
+  font-weight: 700;
+}
+
+.quick-view-close {
+  background: rgba(27, 67, 50, 0.05);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  line-height: 1;
+}
+
+.quick-view-close:hover {
+  background: rgba(27, 67, 50, 0.1);
+  color: var(--green-deep);
+}
+
+.quick-view-content {
+  padding: var(--space-lg);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.quick-view-content::-webkit-scrollbar {
+  width: 6px;
+}
+.quick-view-content::-webkit-scrollbar-thumb {
+  background: var(--parchment-dark);
+  border-radius: 3px;
+}

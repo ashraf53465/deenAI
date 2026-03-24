@@ -91,16 +91,46 @@ const SPECIFIC_ENTRY_KEYWORDS = {
 };
 
 /**
+ * Fuzzy match a query against an array of signals
+ */
+function fuzzyMatchAny(query, array) {
+  const q = query.toLowerCase();
+  
+  // 1. Exact substring check first (fastest)
+  if (array.some(sig => q.includes(sig))) return true;
+  
+  // 2. Fuzzy token check for typos
+  const qTokens = getMeaningfulTokens(q);
+  
+  for (const sig of array) {
+    const sigWords = sig.split(/\s+/);
+    for (const sigWord of sigWords) {
+      if (sigWord.length < 4) continue; // Don't fuzzy match short words (eat, bed, etc.)
+      
+      const allowedDist = sigWord.length > 6 ? 2 : 1;
+      
+      if (qTokens.some(token => {
+        if (Math.abs(token.length - sigWord.length) > allowedDist) return false;
+        return levenshtein(token, sigWord) <= allowedDist;
+      })) {
+        return true; // Typo match found!
+      }
+    }
+  }
+  return false;
+}
+
+/**
  * Detect if the query is about eating, sleeping, or unknown
- * Returns: 'eating' | 'sleeping' | 'both' | null
+ * Returns: 'eating' | 'sleeping' | 'washroom' | 'leaving_home' | 'both' | null
  */
 function detectIntent(query) {
   const q = query.toLowerCase();
   
-  const matchesEating = EATING_SIGNALS.some(sig => q.includes(sig));
-  const matchesSleeping = SLEEPING_SIGNALS.some(sig => q.includes(sig));
-  const matchesWashroom = WASHROOM_SIGNALS.some(sig => q.includes(sig));
-  const matchesHome = HOME_SIGNALS.some(sig => q.includes(sig));
+  const matchesEating = fuzzyMatchAny(q, EATING_SIGNALS);
+  const matchesSleeping = fuzzyMatchAny(q, SLEEPING_SIGNALS);
+  const matchesWashroom = fuzzyMatchAny(q, WASHROOM_SIGNALS);
+  const matchesHome = fuzzyMatchAny(q, HOME_SIGNALS);
   
   if (matchesEating && matchesSleeping) return 'both';
   if (matchesEating) return 'eating';
@@ -109,10 +139,10 @@ function detectIntent(query) {
   if (matchesHome) return 'leaving_home';
   
   // Check specific entry keywords as fallback
-  const matchesEatingSpecific = SPECIFIC_ENTRY_KEYWORDS.eating.some(kw => q.includes(kw));
-  const matchesSleepingSpecific = SPECIFIC_ENTRY_KEYWORDS.sleeping.some(kw => q.includes(kw));
-  const matchesWashroomSpecific = SPECIFIC_ENTRY_KEYWORDS.washroom.some(kw => q.includes(kw));
-  const matchesHomeSpecific = SPECIFIC_ENTRY_KEYWORDS.leaving_home.some(kw => q.includes(kw));
+  const matchesEatingSpecific = fuzzyMatchAny(q, SPECIFIC_ENTRY_KEYWORDS.eating);
+  const matchesSleepingSpecific = fuzzyMatchAny(q, SPECIFIC_ENTRY_KEYWORDS.sleeping);
+  const matchesWashroomSpecific = fuzzyMatchAny(q, SPECIFIC_ENTRY_KEYWORDS.washroom);
+  const matchesHomeSpecific = fuzzyMatchAny(q, SPECIFIC_ENTRY_KEYWORDS.leaving_home);
   
   if (matchesEatingSpecific) return 'eating';
   if (matchesSleepingSpecific) return 'sleeping';

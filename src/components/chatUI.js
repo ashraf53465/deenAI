@@ -28,18 +28,9 @@ function createWelcomeScreen() {
       <div class="welcome-bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
       <h1 class="welcome-title">Deen AI</h1>
       <p class="welcome-subtitle">
-        Your companion for learning authentic Islamic duas and sunnah practices. 
-        Ask me anything about eating and sleeping etiquettes from the Sunnah.
+        Your companion for learning authentic Islamic duas. 
+        Ask away about any sunnah practices...
       </p>
-      <div class="welcome-cards">
-        ${suggestions.map(s => `
-          <div class="welcome-card" data-query="${s.text}" onclick="window.handleSuggestionClick('${s.text}')">
-            <div class="welcome-card-icon">${s.icon}</div>
-            <div class="welcome-card-title">${s.text}</div>
-            <div class="welcome-card-desc">Authentic practices from Sahih hadith</div>
-          </div>
-        `).join('')}
-      </div>
     </div>
   `;
 }
@@ -230,7 +221,6 @@ export function initChatUI(container) {
       <div class="header-left">
         <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰</button>
         <span class="header-title">Deen AI</span>
-        <span class="header-badge">OFFLINE</span>
       </div>
     </div>
     
@@ -257,7 +247,7 @@ export function initChatUI(container) {
           </svg>
         </button>
       </div>
-      <div class="input-hint">Responses strictly from <strong>authenticated hadith sources</strong> • Eating & Sleeping</div>
+      <div class="input-hint">Responses strictly from <strong>authenticated hadith sources</strong></div>
     </div>
   `;
   

@@ -21,7 +21,7 @@ import { getAllEntries, getEntriesByCategory, getCategoryStructure } from '../da
 
 const GREETINGS = ['assalamu alaikum', 'assalamualaikum', 'salam', 'salaam', 'walaikum', 'hello', 'hi', 'hey', 'marhaba'];
 
-const GREETING_RESPONSE = "Wa Alaikum Assalam wa Rahmatullahi wa Barakatuh! 🌙\n\nWelcome to Deen AI. I can help you with duas and sunnah practices for **eating** and **sleeping**.\n\nTry asking me things like:\n• \"Dua before eating\"\n• \"Sunnah of sleeping\"\n• \"What to say after a meal?\"";
+const GREETING_RESPONSE = "Wa Alaikum Assalam wa Rahmatullahi wa Barakatuh! 🌙\n\nWelcome to Deen AI. I can help you with duas and sunnah practices for:\n• **Eating & Sleeping**\n• **Washroom & Leaving Home**\n\nTry asking me things like:\n• \"Dua before eating\"\n• \"Washroom sunnah\"\n• \"Leaving home\"";
 
 function isGreeting(query) {
   const q = query.toLowerCase().trim();
@@ -37,7 +37,7 @@ const EATING_SIGNALS = [
   'eat', 'eating', 'food', 'meal', 'khana', 'khane', 'khate', 'khanay',
   'drink', 'drinking', 'peena', 'peete', 'peene',
   'bismillah', 'alhamdulillah after eat', 'lick', 'finger',
-  'right hand eat', 'sitting eat', 'waste food', 'criticize food',
+  'right hand eat', 'sitting eat', 'waste food', 'criticize food', 'dastarkhwaan'
 ];
 
 const SLEEPING_SIGNALS = [
@@ -49,7 +49,16 @@ const SLEEPING_SIGNALS = [
   'three qul', 'teen qul', 'quls',
   'tasbih fatim', 'subhanallah 33', 'alhamdulillah 33',
   'wudu before sleep', 'dust bed', 'right side sleep',
-  'surah baqarah last', 'last two ayah', 'last two verse',
+  'surah baqarah last', 'last two ayah', 'last two verse', 'astagfar', 'astagfirullah'
+];
+
+const WASHROOM_SIGNALS = [
+  'washroom', 'toilet', 'bathroom', 'restroom', 'loo', 'pee', 'poop', 'istinja',
+  'baitulkhala', 'bait-ul-khala', 'peshaab'
+];
+
+const HOME_SIGNALS = [
+  'home', 'house', 'leave', 'leaving', 'door', 'going out', 'ghar', 'nikal'
 ];
 
 // Specific entry-level keywords that let us definitively match within a category
@@ -59,7 +68,7 @@ const SPECIFIC_ENTRY_KEYWORDS = {
     'criticize', 'waste', 'morsel', 'three fingers', 'barakah food',
     'alhamdulillah eat', 'forgiven', 'sins forgiven',
     'khana khatam', 'khane ke baad', 'khane se pehle',
-    'seedha hath', 'dayen hath', 'baith kar',
+    'seedha hath', 'dayen hath', 'baith kar', 'dastarkhwaan', 'zaanu', 'tek laga', 'luqma', 'bartan'
   ],
   sleeping: [
     'ayatul kursi', 'ayat ul kursi', 'three qul', 'teen qul',
@@ -70,8 +79,15 @@ const SPECIFIC_ENTRY_KEYWORDS = {
     'subhanallah 33', 'dam karna',
     'bismikallah', 'bismika',
     'die and live', 'amut', 'ahya',
-    'sone se pehle', 'uthne ki dua', 'raat ko',
+    'sone se pehle', 'uthne ki dua', 'raat ko', 'astagfar', 'surma', 'qibla', 'aundha', 'pet ke bal'
   ],
+  washroom: [
+    'enter washroom', 'leave washroom', 'khubuth', 'khabaith', 'ghufranaka',
+    'joota', 'chappal', 'sar dhhaank', 'left foot', 'right foot', 'qible ki taraf na munh', 'bilkul baat na karna', 'saabun', 'dho lena', 'baayaan paaon'
+  ],
+  leaving_home: [
+    'leave home', 'ghar se nikal', 'tawakkaltu', 'la hawla', 'salaam kar ke nikalna'
+  ]
 };
 
 /**
@@ -83,17 +99,25 @@ function detectIntent(query) {
   
   const matchesEating = EATING_SIGNALS.some(sig => q.includes(sig));
   const matchesSleeping = SLEEPING_SIGNALS.some(sig => q.includes(sig));
+  const matchesWashroom = WASHROOM_SIGNALS.some(sig => q.includes(sig));
+  const matchesHome = HOME_SIGNALS.some(sig => q.includes(sig));
   
   if (matchesEating && matchesSleeping) return 'both';
   if (matchesEating) return 'eating';
   if (matchesSleeping) return 'sleeping';
+  if (matchesWashroom) return 'washroom';
+  if (matchesHome) return 'leaving_home';
   
   // Check specific entry keywords as fallback
   const matchesEatingSpecific = SPECIFIC_ENTRY_KEYWORDS.eating.some(kw => q.includes(kw));
   const matchesSleepingSpecific = SPECIFIC_ENTRY_KEYWORDS.sleeping.some(kw => q.includes(kw));
+  const matchesWashroomSpecific = SPECIFIC_ENTRY_KEYWORDS.washroom.some(kw => q.includes(kw));
+  const matchesHomeSpecific = SPECIFIC_ENTRY_KEYWORDS.leaving_home.some(kw => q.includes(kw));
   
   if (matchesEatingSpecific) return 'eating';
   if (matchesSleepingSpecific) return 'sleeping';
+  if (matchesWashroomSpecific) return 'washroom';
+  if (matchesHomeSpecific) return 'leaving_home';
   
   return null;
 }
@@ -103,8 +127,8 @@ function detectIntent(query) {
  */
 function detectSubType(query) {
   const q = query.toLowerCase();
-  if (q.includes('before') || q.includes('pehle') || q.includes('start')) return 'dua_before';
-  if (q.includes('after') || q.includes('baad') || q.includes('done') || q.includes('finish') || q.includes('waking') || q.includes('wake') || q.includes('uthne') || q.includes('utho')) return 'dua_after';
+  if (q.includes('before') || q.includes('pehle') || q.includes('start') || q.includes('enter') || q.includes('andar')) return 'dua_before';
+  if (q.includes('after') || q.includes('baad') || q.includes('done') || q.includes('finish') || q.includes('waking') || q.includes('wake') || q.includes('uthne') || q.includes('utho') || q.includes('exit') || q.includes('baahar')) return 'dua_after';
   if (q.includes('sunnah') || q.includes('sunnat') || q.includes('etiquette') || q.includes('manners') || q.includes('adab') || q.includes('how to') || q.includes('tarika')) return 'sunnah';
   return null;
 }
@@ -233,9 +257,9 @@ function formatEntry(entry) {
 }
 
 // The "I don't have that" message — shown for ANY query we can't answer
-const NO_ANSWER_MSG = `I don't have an answer for that. 🤲\n\nI can currently only help with:\n• **Eating** — Duas before & after eating, Sunnah of eating\n• **Sleeping** — Duas before sleeping & upon waking, Sunnah of sleeping\n\nIn sha Allah, more topics will be added soon!`;
+const NO_ANSWER_MSG = `I don't have an answer for that. 🤲\n\nI can currently only help with:\n• **Eating** & **Sleeping**\n• **Washroom** & **Leaving Home**\n\nIn sha Allah, more topics will be added soon!`;
 
-const OUT_OF_SCOPE_MSG = `I'm Deen AI — your companion for learning Islamic practices. 🌙\n\nI can only help with **Deeniyat topics**. Right now I cover:\n• **Eating** — Duas and Sunnah practices\n• **Sleeping** — Duas and Sunnah practices\n\nPlease ask me something related to these topics!`;
+const OUT_OF_SCOPE_MSG = `I'm Deen AI — your companion for learning Islamic practices. 🌙\n\nI can only help with **Deeniyat topics**. Right now I cover:\n• **Eating & Sleeping**\n• **Washroom & Leaving Home**\n\nPlease ask me something related to these topics!`;
 
 // ═══════════════════════════════════════════════
 // MAIN SEARCH FUNCTION
@@ -362,8 +386,8 @@ export function search(query) {
 export function getSuggestions() {
   return [
     { text: "Dua before eating", icon: "🍽️", category: "eating" },
-    { text: "Sunnah of eating", icon: "🥄", category: "eating" },
-    { text: "Dua before sleeping", icon: "🌙", category: "sleeping" },
-    { text: "Sunnah of sleeping", icon: "⭐", category: "sleeping" },
+    { text: "Sunnah of sleeping", icon: "🌙", category: "sleeping" },
+    { text: "Entering washroom", icon: "🚿", category: "washroom" },
+    { text: "Leaving home", icon: "🚪", category: "leaving_home" },
   ];
 }

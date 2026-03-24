@@ -160,6 +160,17 @@ function formatEntry(entry) {
     response += `<div class="translation">"${entry.translation}"</div>\n`;
   }
   
+  if (entry.arabic || entry.translation || entry.transliteration) {
+    const arabicText = (entry.arabic || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    const engText = (entry.translation || entry.transliteration || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    const btnId = 'btn-' + Math.random().toString(36).substr(2, 9);
+    response += `<div class="card-actions">
+      <button id="${btnId}" class="play-btn" onclick="window.playDeenAudio('${arabicText}', '${engText}', '${btnId}')">
+        <span class="icon">▶</span> Play Audio
+      </button>
+    </div>\n`;
+  }
+  
   if (entry.details) {
     response += `<div class="details">${entry.details}</div>\n`;
   }

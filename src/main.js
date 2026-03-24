@@ -4,6 +4,8 @@
  */
 
 import './styles/index.css';
+import './engine/ttsEngine.js';
+import { registerSW } from 'virtual:pwa-register';
 import { initChatUI } from './components/chatUI.js';
 import { initSidebar } from './components/sidebar.js';
 
@@ -31,4 +33,14 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
   init();
+}
+
+// Register PWA Service Worker
+if ('serviceWorker' in navigator) {
+  registerSW({
+    immediate: true,
+    onOfflineReady() {
+      console.log('Deen AI is ready for offline use.');
+    }
+  });
 }

@@ -689,6 +689,45 @@ body {
   margin: var(--space-sm) 0;
 }
 
+/* ─── Card Actions & Play Button ─── */
+.card-actions {
+  display: flex;
+  margin-top: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.play-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(45, 106, 79, 0.08); /* green-mid with opacity */
+  color: var(--green-deep);
+  border: 1px solid rgba(45, 106, 79, 0.2);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.play-btn:hover {
+  background: rgba(45, 106, 79, 0.15);
+  transform: translateY(-1px);
+}
+
+.play-btn.playing {
+  background: var(--gold);
+  color: var(--green-deep);
+  border-color: var(--gold-dim);
+  box-shadow: 0 2px 8px rgba(201, 162, 39, 0.3);
+}
+
+.play-btn .icon {
+  font-size: 0.9rem;
+}
+
 /* ─── Typing Indicator ─── */
 .typing-indicator {
   display: flex;

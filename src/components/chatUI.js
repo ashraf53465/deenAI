@@ -18,12 +18,10 @@ function createWelcomeScreen() {
   return `
     <div class="welcome-screen" id="welcome-screen">
       <svg class="geometric-decoration" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="45" stroke="#1B4332" stroke-width="1"/>
-        <circle cx="50" cy="50" r="35" stroke="#1B4332" stroke-width="0.5"/>
-        <path d="M50 5 L50 95 M5 50 L95 50" stroke="#1B4332" stroke-width="0.5"/>
-        <path d="M50 15 L85 50 L50 85 L15 50 Z" stroke="#C9A227" stroke-width="0.8" fill="none"/>
-        <circle cx="50" cy="50" r="20" stroke="#C9A227" stroke-width="0.5"/>
-        <path d="M50 5 L61 30 L89 30 L67 48 L74 75 L50 58 L26 75 L33 48 L11 30 L39 30 Z" stroke="#1B4332" stroke-width="0.3" fill="none"/>
+        <circle cx="50" cy="50" r="40" stroke="var(--accent)" stroke-width="0.5" stroke-dasharray="4 4"/>
+        <circle cx="50" cy="50" r="20" stroke="var(--text-muted)" stroke-width="1"/>
+        <path d="M50 15 L50 85 M15 50 L85 50" stroke="var(--accent)" stroke-width="0.5" opacity="0.5"/>
+        <circle cx="50" cy="50" r="3" fill="var(--text-primary)"/>
       </svg>
       <div class="welcome-bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
       <h1 class="welcome-title">Deen AI</h1>
@@ -222,6 +220,13 @@ export function initChatUI(container) {
         <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰</button>
         <span class="header-title">Deen AI</span>
       </div>
+      <div class="header-right">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Theme">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
     </div>
     
     <!-- Chat Messages -->
@@ -276,6 +281,17 @@ export function initChatUI(container) {
     if (sidebar) sidebar.classList.toggle('open');
     if (overlay) overlay.classList.toggle('visible');
   });
+  
+  // Theme Toggle
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('deen-ai-theme', next);
+    });
+  }
   
   // Global function for suggestion card clicks
   window.handleSuggestionClick = (text) => {

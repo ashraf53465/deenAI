@@ -9,6 +9,10 @@ import { registerSW } from 'virtual:pwa-register';
 import { initChatUI } from './components/chatUI.js';
 import { initSidebar } from './components/sidebar.js';
 
+// Initialize Theme early to prevent flash
+const savedTheme = localStorage.getItem('deen-ai-theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
+
 function init() {
   const app = document.getElementById('app');
   
